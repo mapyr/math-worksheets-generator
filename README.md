@@ -20,17 +20,23 @@ Skrypt `main.py` generuje PDF z zadaniami dodawania z przeniesieniem oraz odejmo
 
 ## Wymagania
 
-Plik `requirements.txt` (utwórz samodzielnie):
+Instalacja i uruchomienie (Poetry):
 
 ```
-matplotlib
-numpy
+poetry install
+poetry run dodawanie
+# albo pełne wywołanie:
+poetry run python main.py
 ```
 
-Instalacja:
-
+Aktualizacja zależności:
 ```
-pip install -r requirements.txt
+poetry update
+```
+
+Dodanie paczki opcjonalnej (np. pillow):
+```
+poetry add pillow
 ```
 
 ## Uruchomienie podstawowe
@@ -51,13 +57,13 @@ Aktualne domyślne parametry (styl „zeszyt_czysty”):
 Uruchomienie z domyślną konfiguracją (wygeneruje zeszyt_czysty.pdf):
 
 ```
-# (Linia usunięta – polecenie powtarza podstawowy przykład wyżej.)
+poetry run dodawanie
 ```
 
-(Przykład poniżej był starszą wersją domyślnych parametrów – usunięto; obecnie domyślnie generuje 18 zadań stylu „zeszyt_czysty”.)
+Aby wygenerować arkusz zjawnie podaną liczbą zadań i cyfr:
 
 ```
-python main.py
+poetry run python main.py -n 60 --max-digits 4 -o arkusz.pdf
 ```
 
 Określenie liczby zadań, maksymalnej liczby cyfr i wyjścia:
@@ -462,4 +468,4 @@ python main.py -n 18 --mode addition --max-digits 2 \
 - Styl `underline` przy bardzo długich liczbach: rozważ zwiększenie `--cols` aby komórki były węższe (łatwiejsze wyrównanie).
 - Dla jasnych prowadnic używaj większej przezroczystości (`--digit-guides-alpha 0.25–0.35`) i koloru zbliżonego do tła (#CCCCCC–#DDDDDD).
 
-Sekcja odzwierciedla bieżące domyślne ustawienie (brak „-----” dzięki `--operation-bar-style vector`). Jeśli potrzebujesz retro wyglądu, dodaj `--operation-bar-style ascii`. Styl pól pudełkowych został usunięty – używaj `line`, `underline` lub `none`.
+Sekcja pokazuje aktualne domyślne ustawienie (wektorowa kreska). Retro wygląd: `--operation-bar-style ascii`. Dostępne style miejsca wyniku: `line`, `underline`, `none`.
