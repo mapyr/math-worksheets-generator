@@ -1,0 +1,81 @@
+[tool.poetry]
+name = "matematyka"
+version = "0.1.0"
+description = "Generator kart pracy: dodawanie pisemne z przeniesieniem (PDF) – macOS/Linux/Windows."
+authors = ["Autor <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+keywords = ["education", "mathematics", "worksheet", "pdf", "addition", "generator"]
+homepage = "https://example.com/matematyka"
+repository = "https://example.com/matematyka.git"
+documentation = "https://example.com/matematyka/docs"
+packages = []  # Brak pakietów (pojedynczy skrypt main.py). Możesz później zmienić strukturę na modułową.
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.13"
+matplotlib = "^3.8.0"
+numpy = "^1.26.0"
+
+# Opcjonalne pakiety przydatne przy rozszerzeniach (dodaj poprzez: poetry add pillow)
+# pillow = "^10.0.0"
+# fonttools = "^4.0.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.0.0"
+ruff = "^0.6.0"
+mypy = "^1.10.0"
+types-setuptools = "^68.0.0.0"
+
+[tool.poetry.scripts]
+dodawanie = "main:main"
+
+# Konfiguracje narzędzi formatowania / lintingu / typów
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+skip-string-normalization = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E203", "E501"]  # Kompatybilność z Black
+exclude = [
+    ".venv",
+    "build",
+    "dist",
+]
+
+[tool.ruff.isort]
+known-first-party = ["matematyka"]
+combine-as-imports = true
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+disallow_untyped_defs = true
+disallow_any_generics = true
+show_error_codes = true
+
+[build-system]
+requires = ["poetry-core>=1.7.0"]
+build-backend = "poetry.core.masonry.api"
+
+# Instrukcje użytkowe (informacyjne):
+# 1. Instalacja Poetry (jeśli brak):
+#    curl -sSL https://install.python-poetry.org | python3 -
+# 2. Inicjalizacja środowiska i instalacja:
+#    poetry install
+# 3. Uruchomienie programu:
+#    poetry run python main.py
+#    lub (skrót dzięki scripts):
+#    poetry run dodawanie --problems 60
+# 4. Aktualizacja zależności:
+#    poetry update
+# 5. Dodanie paczki opcjonalnej:
+#    poetry add pillow

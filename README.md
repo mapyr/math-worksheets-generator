@@ -1,6 +1,6 @@
 # Generator kart pracy: działania pisemne (+ / -)
 
-(Domyślny styl: „zeszyt_czysty” – 18 zadań dodawania, 2 kolumny × 9 wierszy, czcionka 26 pt, brak dodatkowych linii i oznaczenia miejsca wyniku.)
+(Domyślny styl: „zeszyt_czysty” – 18 zadań dodawania, 2 kolumny × 9 wierszy, czcionka 26 pt, brak dodatkowych linii, brak oznaczenia miejsca wyniku (`--result-guide-style none`), kreska wektorowa (`--operation-bar-style vector`). Dostępny także tekstowy seed przez `--seed-text`.)
 
 Skrypt `main.py` generuje PDF z zadaniami dodawania z przeniesieniem oraz odejmowania z pożyczką (lub mieszanką obu). Umożliwia estetyczne rozmieszczenie przykładów, konfigurowalne odstępy, linie na odpowiedź, różne rozmiary czcionek, a także tworzenie arkuszy odpowiadających poziomowi uczniów.
 
@@ -51,10 +51,10 @@ Aktualne domyślne parametry (styl „zeszyt_czysty”):
 Uruchomienie z domyślną konfiguracją (wygeneruje zeszyt_czysty.pdf):
 
 ```
-python main.py
+# (Linia usunięta – polecenie powtarza podstawowy przykład wyżej.)
 ```
 
-Wygenerowanie 48 zadań dodawania (domyślne parametry):
+(Przykład poniżej był starszą wersją domyślnych parametrów – usunięto; obecnie domyślnie generuje 18 zadań stylu „zeszyt_czysty”.)
 
 ```
 python main.py
@@ -176,6 +176,7 @@ python main.py -n 54 --mode mixed --mixed-ratio 0.5 \
 | `--paper {A4,Letter,custom}`                                                      | Format papieru.                                                                           |
 | `--custom-width`, `--custom-height`                                               | Wymiary w calach dla paper=custom.                                                        |
 | `--seed SEED`                                                                     | Powtarzalność losowania.                                                                  |
+| `--seed-text TXT`                                                                 | Tekstowy seed (hash SHA256 → liczba); wygodne etykiety np. "tydzien_12", "grupa_A".        |
 | `--unique`                                                                        | Unikalność par (dla dodawania bez względu na kolejność; odejmowanie zachowuje kolejność). |
 | `--no-answers`                                                                    | Pominięcie strony z odpowiedziami.                                                        |
 
@@ -233,6 +234,68 @@ Domyślnie generowana (chyba że podasz `--no-answers`). Pokazuje operator zgodn
 
 - Użycie `--seed` pozwala uzyskać identyczny zestaw przy kolejnych uruchomieniach.
 - Zmiana `--mixed-ratio` przy tym samym seedzie da inny układ proporcji.
+- Alternatywnie możesz użyć `--seed-text`, np.:
+  - `--seed-text "tydzien_01"` – arkusz dla pierwszego tygodnia
+  - `--seed-text "tydzien_01_add"` vs `--seed-text "tydzien_01_sub"` aby rozdzielić tryby
+  - `--seed-text "grupa_A"` / `--seed-text "grupa_B"` dla różnych poziomów
+  Tekst zamieniany jest przez SHA256 na 64‑bitową liczbę, dzięki czemu dowolny ciąg daje stabilny wynik bez zapamiętywania wartości liczbowych.
+
+## Rotacyjne generowanie arkuszy (przykłady)
+
+Poniższe przykłady pokazują jak tworzyć serię arkuszy na kolejne dni / tygodnie zachowując spójny wygląd przy zmieniających się działaniach.
+
+### Tygodniowa rotacja (liczbowe seedy)
+
+Wspólny styl „zeszyt_czysty” (18 zadań, 2×9, duża czcionka, brak linii odpowiedzi):
+
+```
+python main.py -n 18 --mode mixed --mixed-ratio 0.5 --seed 101 -o tydzien_pon.pdf
+python main.py -n 18 --mode addition                --seed 102 -o tydzien_wt.pdf
+python main.py -n 18 --mode subtraction             --seed 103 -o tydzien_sr.pdf
+python main.py -n 18 --mode mixed --mixed-ratio 0.3 --seed 104 -o tydzien_czw.pdf
+python main.py -n 18 --mode mixed --mixed-ratio 0.7 --seed 105 -o tydzien_pt.pdf
+```
+
+### Tygodniowa rotacja (tekstowe seedy)
+
+Tekstowe etykiety łatwiejsze do zapamiętania niż liczby:
+
+```
+python main.py -n 18 --mode mixed --mixed-ratio 0.5 --seed-text "tydzien_01_pon" -o tydzien_01_pon.pdf
+python main.py -n 18 --mode addition                --seed-text "tydzien_01_wt"  -o tydzien_01_wt.pdf
+python main.py -n 18 --mode subtraction             --seed-text "tydzien_01_sr"  -o tydzien_01_sr.pdf
+python main.py -n 18 --mode mixed --mixed-ratio 0.3 --seed-text "tydzien_01_czw" -o tydzien_01_czw.pdf
+python main.py -n 18 --mode mixed --mixed-ratio 0.7 --seed-text "tydzien_01_pt"  -o tydzien_01_pt.pdf
+```
+
+Zmieniając tylko sufiks tygodnia otrzymujesz spójne serie:
+`"tydzien_02_pon"`, `"tydzien_02_wt"`, … itd.
+
+### Poziomy trudności (tekstowe seedy dla grup)
+
+```
+python main.py -n 18 --mode mixed --mixed-ratio 0.5 --max-digits 2 --seed-text "grupa_A" -o grupa_A.pdf
+python main.py -n 18 --mode mixed --mixed-ratio 0.5 --max-digits 3 --seed-text "grupa_B" -o grupa_B.pdf
+python main.py -n 18 --mode mixed --mixed-ratio 0.5 --max-digits 4 --seed-text "grupa_C" -o grupa_C.pdf
+```
+
+### Cykliczna zmiana proporcji działań (utrzymanie seeda)
+
+Przy stałym `--seed` lub `--seed-text` zmiana `--mixed-ratio` nadaje arkuszowi inną mieszankę:
+
+```
+python main.py -n 18 --mode mixed --mixed-ratio 0.4 --seed-text "blok_01" -o blok_01_ratio_40.pdf
+python main.py -n 18 --mode mixed --mixed-ratio 0.6 --seed-text "blok_01" -o blok_01_ratio_60.pdf
+```
+
+### Warianty stylu z identycznym zbiorem działań
+
+Ten sam zestaw działań, dwa różne wyglądy (np. wersja ucznia i wersja korekcyjna):
+
+```
+python main.py -n 18 --seed-text "tydzien_05_pon" -o uczniowie.pdf
+python main.py -n 18 --seed-text "tydzien_05_pon" --answer-lines 3 --answer-line-spacing-mm 9 --result-guide-style line -o korekta.pdf
+```
 
 ## Minimalny przykład (bez linii odpowiedzi, szybki arkusz)
 
